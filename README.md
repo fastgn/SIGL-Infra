@@ -1,1 +1,1 @@
-# SIGL-Infra
+# SIGL
