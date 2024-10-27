@@ -14,3 +14,4 @@ sigl.terraform/Peering/terraform.tfstate
 sigl.terraform/Peering/terraform.tfstate.backup
 sigl.terraform/Frontend/.terraform/providers/registry.terraform.io/hashicorp/azurerm/4.5.0/linux_amd64/*
 sigl.terraform/Peering/.terraform/providers/registry.terraform.io/hashicorp/azurerm/4.5.0/linux_amd64/*
+conexion.md
