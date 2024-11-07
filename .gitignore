@@ -1,0 +1,15 @@
+# fichiers à ignorer
+
+sigl.terraform/.terraform
+sigl.terraform/.terraform.lock.hcl
+sigl.terraform/.terraform.lock.info
+sigl.terraform/terraform.tfstate
+sigl.terraform/terraform.tfstate.backup
+sigl.terraform/terraform.tfvars
+sigl.terraform/backend.tf
+sigl.terraform/modules/backend/backend_private_ssh.key
+sigl.terraform/modules/backend/backend_public_ssh.key
+sigl.terraform/modules/frontend/frontend_private_ssh.key
+sigl.terraform/modules/frontend/frontend_public_ssh.key
+sigl.terraform/modules/bastion/bastion_private_ssh.key
+sigl.terraform/modules/bastion/bastion_public_ssh.key
