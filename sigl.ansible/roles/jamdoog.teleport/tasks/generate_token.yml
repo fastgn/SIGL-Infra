@@ -1,0 +1,32 @@
+---
+- name: Delete token if already exists
+  shell: "tctl tokens rm {{ INVITE_TOKEN }}"
+  delegate_to: "{{ TELEPORT_TOKEN_HOST }}"
+  when: INVITE_TOKEN is defined
+
+- name: Generate a token for Teleport deployment (SSH)
+  shell: "tctl tokens add --ttl={{ TOKEN_TTL }} --type=node --format=json"
+  when: GENERATE_TOKEN_SSH_ONLY and INVITE_TOKEN is not defined
+  register: GENERATED_TOKEN
+  delegate_to: "{{ TELEPORT_TOKEN_HOST }}"
+
+- name: Generate a token for Teleport Deployment (APP)
+  shell: "tctl tokens add --ttl={{ TOKEN_TTL }} --type=app --format=json"
+  when: GENERATE_TOKEN_APP_ONLY and INVITE_TOKEN is not defined
+  register: GENERATED_TOKEN
+  delegate_to: "{{ TELEPORT_TOKEN_HOST }}"
+
+- name: Generate a token for Teleport Deployment (SSH+APP)
+  shell: |
+    export TELEPORT_USER="sigladmin"
+    export TELEPORT_KEY_PATH="/mnt/c/Users/ndeno/Documents/ESEO/E5A/SIGL/Projet/sigl.terraform/terraform/modules/bastion/bastion_private_ssh.key"
+    tctl tokens add --ttl={{ TOKEN_TTL }} --type=node,app --format=json
+  when: GENERATE_TOKEN_COMBO and INVITE_TOKEN is not defined
+  register: GENERATED_TOKEN
+  delegate_to: "{{ TELEPORT_TOKEN_HOST }}"
+
+
+- name: Set Token
+  set_fact:
+    INVITE_TOKEN: "{{ GENERATED_TOKEN.stdout | from_json | json_query('token') }}"
+  when: INVITE_TOKEN is not defined

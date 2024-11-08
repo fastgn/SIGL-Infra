@@ -1,5 +1,6 @@
 # fichiers à ignorer
 
+# Fichiers terraform
 sigl.terraform/.terraform
 sigl.terraform/.terraform.lock.hcl
 sigl.terraform/.terraform.lock.info
@@ -13,3 +14,16 @@ sigl.terraform/modules/frontend/frontend_private_ssh.key
 sigl.terraform/modules/frontend/frontend_public_ssh.key
 sigl.terraform/modules/bastion/bastion_private_ssh.key
 sigl.terraform/modules/bastion/bastion_public_ssh.key
+
+# Fichiers Ansible
+
+sigl.ansible/.ansible
+sigl.ansible/hosts
+sigl.ansible/ansible.log
+
+# Scripts bash
+sigl.bash/sshconf.sh
+sigl.bash/permission.sh
+sigl.bash/frontend.sh
+sigl.bash/proxy.sh
+sigl.bash/web-server.sh
