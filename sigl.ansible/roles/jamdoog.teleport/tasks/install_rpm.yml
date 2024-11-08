@@ -1,0 +1,23 @@
+---
+- name: Install Teleport Repo
+  yum_repository:
+    name: teleport
+    description: Gravitational Teleport packages
+    baseurl: https://rpm.releases.teleport.dev/
+    gpgcheck: yes
+    enabled: yes
+    gpgkey: https://rpm.releases.teleport.dev/RPM-GPG-KEY-teleport
+
+- name: Install Teleport Package (DNF)
+  dnf:
+    name: teleport-{{ TELEPORT_MAJOR_VERSION }}.{{ TELEPORT_MINOR_VERSION }}
+    state: present
+    allow_downgrade: yes
+  when: ansible_distribution_version >= '8'
+
+- name: Install Teleport Package (YUM)
+  yum:
+    name: teleport-{{ TELEPORT_MAJOR_VERSION }}.{{ TELEPORT_MINOR_VERSION }}
+    state: present
+    allow_downgrade: yes
+  when: ansible_distribution_version < '8'

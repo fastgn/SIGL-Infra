@@ -1,0 +1,32 @@
+---
+- name: Check Teleport GPG Key
+  stat:
+    path: /etc/apt/trusted.gpg.d/teleport-archive-keyring.asc
+  register: gpg
+
+- name: Download GPG Key
+  get_url:
+    url: https://apt.releases.teleport.dev/gpg
+    dest: /etc/apt/trusted.gpg.d/teleport-archive-keyring.asc
+    mode: 0400
+    owner: _apt
+  when: gpg.stat.exists == false
+
+- name: Check APT Repo
+  stat:
+    path: /etc/apt/sources.list.d/teleport.list
+  register: repo
+
+- name: Install APT repository
+  apt_repository:
+    repo: "deb [signed-by=/etc/apt/trusted.gpg.d/teleport-archive-keyring.asc] https://apt.releases.teleport.dev/{{ansible_facts['distribution']|lower}} {{ansible_distribution_release}} stable/v{{TELEPORT_MAJOR_VERSION}}"
+    state: present
+    update_cache: no
+  when: repo.stat.exists == false
+
+- name: Install Teleport
+  apt:
+    name: teleport={{ TELEPORT_MAJOR_VERSION }}.{{ TELEPORT_MINOR_VERSION }}
+    update_cache: yes
+    state: present
+    allow_downgrade: yes

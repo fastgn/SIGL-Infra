@@ -1,0 +1,50 @@
+---
+- name: Check if the OS is proxmox
+  stat:
+    path: /etc/apt/sources.list.d/pve-install-repo.list
+  ignore_errors: true
+  register: proxmox_check
+  when:
+    - CREATE_OS_COMMAND
+    - ansible_os_family == 'Debian'
+
+- name: Deploy Teleport Template
+  template:
+    src: teleport.yaml
+    dest: /etc/teleport.yaml
+    owner: root
+    group: root
+    mode: 0400
+  notify: teleport
+
+- name: Deploy Teleport SSH
+  lineinfile:
+    dest: /etc/teleport.yaml
+    line: "ssh_service:\n  enabled: yes"
+    create: yes
+  when: SSH_SERVICE
+
+- name: Set spaces for commands
+  set_fact:
+    space1: "  "
+    space2: "    "
+  when: CREATE_SSH_COMMANDS
+
+- include_tasks: commands.yml
+  when: CREATE_SSH_COMMANDS
+
+- name: Deploy Teleport Application
+  lineinfile:
+    dest: /etc/teleport.yaml
+    line: "app_service:\n  enabled: yes\n  apps:\n  - name: '{{ TELEPORT_APPLICATION_NAME | lower }}'\n    insecure_skip_verify: {{ TELEPORT_APPLICATION_IGNORE_TLS | lower }}\n    uri: '{{ TELEPORT_APPLICATION_URI | lower }}'"
+    create: yes
+  when: APP_SERVICE
+
+- name: Set spaces for commands
+  set_fact:
+    space1: "    "
+    space2: "      "
+  when: CREATE_APP_COMMANDS
+
+- include_tasks: commands.yml
+  when: CREATE_APP_COMMANDS

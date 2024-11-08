@@ -1,0 +1,17 @@
+---
+- include_tasks: generate_token.yml
+  when: GENERATE_TOKEN
+
+- include_tasks: install_apt.yml
+  when: ansible_os_family == 'Debian'
+
+- include_tasks: install_rpm.yml
+  when: ansible_os_family == 'RedHat'
+
+- include_tasks: install_other.yml
+  when: ansible_os_family not in ['Debian', 'RedHat']
+
+- include_tasks: configure.yml
+
+- include_tasks: generate_token.yml
+  when: GENERATE_TOKEN

@@ -1,0 +1,32 @@
+- hosts: bastion
+  become: true
+  roles:
+    - jamdoog.teleport
+  vars:
+    GENERATE_TOKEN: true
+    GENERATE_TOKEN_COMBO: true  # Génère des tokens pour SSH et l'application
+    GENERATE_TOKEN_SSH_ONLY: false
+    GENERATE_TOKEN_APP_ONLY: false
+    TOKEN_TTL: "2m"
+    TELEPORT_TOKEN_HOST: "sigl-admin-bastion.francecentral.cloudapp.azure.com"
+
+    # Informations d'authentification pour le serveur Teleport
+    CA_PIN: "sha256:2awdwadwad678767awd768awdd"
+    TELEPORT_HOST: "sigl-bastion.francecentral.cloudapp.azure.com:443"
+    
+    # Nom de l'application dans Teleport (par exemple pour un portail ou application admin)
+    TELEPORT_APPLICATION_NAME: "sigl_admin"
+    TELEPORT_APPLICATION_IGNORE_TLS: true
+    TELEPORT_APPLICATION_URI: "https://sigl-admin-bastion.francecentral.cloudapp.azure.com:443"
+
+    # Variables pour installer et configurer Teleport
+    TELEPORT_MINOR_VERSION: 3.2
+    TELEPORT_MAJOR_VERSION: 10
+    SSH_SERVICE: true
+    APP_SERVICE: true
+    CREATE_COMMANDS: true
+    CREATE_HOSTNAME_COMMAND: true
+    CREATE_OS_COMMAND: true
+    CREATE_KERNEL_COMMAND: true
+    CREATE_TELEPORT_COMMAND: true
+    CREATE_VIRTUALIZATION_COMMAND: true

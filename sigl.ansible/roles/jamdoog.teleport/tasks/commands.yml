@@ -1,0 +1,53 @@
+---
+- name: Deploy Commands
+  lineinfile:
+    dest: /etc/teleport.yaml
+    line: "{{space1}}commands:"
+    create: yes
+
+- name: Deploy Hostname Command
+  lineinfile:
+    dest: /etc/teleport.yaml
+    line: "{{space1}}- name: Hostname\n{{space2}}command: [hostname]\n{{space2}}period: 24h"
+    create: yes
+  when: CREATE_HOSTNAME_COMMAND
+
+- name: Deploy Operating System Command (Debian)
+  lineinfile:
+    dest: /etc/teleport.yaml
+    line: "{{space1}}- name: OS\n{{space2}}command: ['/bin/cat', '/etc/issue']\n{{space2}}period: 24h"
+    create: yes
+  when: 
+    - CREATE_OS_COMMAND
+    - ansible_os_family == 'Debian'
+    - not proxmox_check
+
+- name: Deploy Operating System Command (RHEL)
+  lineinfile:
+    dest: /etc/teleport.yaml
+    line: "{{space1}}- name: OS\n{{space2}}command: ['/bin/cat', '/etc/redhat-release']\n{{space2}}period: 24h"
+    create: yes
+  when: 
+    - CREATE_OS_COMMAND
+    - ansible_os_family == 'RedHat'
+
+- name: Deploy Kernel Command
+  lineinfile:
+    dest: /etc/teleport.yaml
+    line: "{{space1}}- name: Kernel\n{{space2}}command: ['/bin/uname', '-r']\n{{space2}}period: 24h"
+    create: yes
+  when: CREATE_KERNEL_COMMAND
+
+- name: Deploy Teleport Version Command
+  lineinfile:
+    dest: /etc/teleport.yaml
+    line: "{{space1}}- name: Teleport\n{{space2}}command: ['/usr/local/bin/teleport', 'version']\n{{space2}}period: 24h"
+    create: yes
+  when: CREATE_TELEPORT_COMMAND
+
+- name: Deploy Virtualization Detection Command
+  lineinfile:
+    dest: /etc/teleport.yaml
+    line: "{{space1}}- name: Virtualization\n{{space2}}command: ['/usr/bin/systemd-detect-virt']\n{{space2}}period: 24h"
+    create: yes
+  when: CREATE_VIRTUALIZATION_COMMAND

@@ -1,0 +1,63 @@
+---
+- name: Install tar and gzip
+  package:
+    name:
+      - tar
+      - gzip
+    state: present
+
+- name: Check if Teleport tarball exists
+  stat:
+    path: /tmp/teleport-v{{ TELEPORT_MAJOR_VERSION }}.{{ TELEPORT_MINOR_VERSION }}-linux-amd64-bin.tar.gz
+  register: tarball
+
+- name: Download Teleport binaries
+  get_url:
+    url: https://get.gravitational.com/teleport-v{{ TELEPORT_MAJOR_VERSION }}.{{ TELEPORT_MINOR_VERSION }}-linux-amd64-bin.tar.gz
+    dest: /tmp/teleport-v{{ TELEPORT_MAJOR_VERSION }}.{{ TELEPORT_MINOR_VERSION }}-linux-amd64-bin.tar.gz
+    checksum: sha256:https://get.gravitational.com/teleport-v{{ TELEPORT_MAJOR_VERSION }}.{{ TELEPORT_MINOR_VERSION }}-linux-amd64-bin.tar.gz.sha256
+  when: tarball.stat.exists == false
+
+- name: Uncompress Teleport binaries
+  unarchive:
+    src: /tmp/teleport-v{{ TELEPORT_MAJOR_VERSION }}.{{ TELEPORT_MINOR_VERSION }}-linux-amd64-bin.tar.gz
+    remote_src: yes
+    dest: /tmp/
+
+- name: Copy Teleport binaries
+  copy:
+    src: "{{ item }}"
+    dest: /usr/local/bin
+    mode: u+rwx,g-xr,o-x
+    remote_src: yes
+  loop:
+    - /tmp/teleport/tctl
+    - /tmp/teleport/tsh
+    - /tmp/teleport/teleport
+    - /tmp/teleport/tbot
+
+- name: Register init system
+  stat:
+    path: /run/systemd/system
+  register: systemd
+
+- name: Check if systemd is present
+  fail:
+    msg: This playbook requires systemd to be your init system.
+  when: systemd.stat.exists == false
+
+- name: Check if systemd unit file is present
+  stat:
+    path: /etc/systemd/system/teleport.service
+  register: systemdunit
+
+- name: Install systemd unit file for Teleport
+  shell:
+    cmd: /usr/local/bin/teleport install systemd -o /etc/systemd/system/teleport.service
+  when: systemdunit.stat.exists == false
+
+- name: Enable systemd unit file for Teleport
+  systemd:
+    state: stopped
+    enabled: yes
+    name: teleport
